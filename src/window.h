@@ -1,35 +1,46 @@
 #pragma once
 
-#include "../lib/glm/glm.hpp"
+#include <iostream>
 
-#include "input.h"
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
+#include <glm/glm.hpp>
 
 class Window
 {
-private:
-	// handle and window information
-	GLFWwindow* m_handle = nullptr;
-	
-	// mouse and keyboard
-	Keyboard m_keyboard;
-	Mouse m_mouse;
-
-	glm::ivec2 m_window_size;
-
 public:
-	// constructor / destructor
-	Window(char* name, glm::ivec2 size);
+	Window(GLFWwindow* window_);
 	~Window();
 
-	glm::ivec2 getSize() { return m_window_size; }
+	glm::ivec2 getSize() { return { win_size_x, win_size_y }; }
 
-	Keyboard* getKeyboardPtr() { return &m_keyboard; }
-	Mouse* getMousePtr() { return &m_mouse; }
 	GLFWwindow* getWindowHandle() { return m_handle; }
-
-	// closing
+	
+	// window
+	void setTitle(const char* text) { glfwSetWindowTitle(m_handle, text); }
+	void maximize() { glfwSetWindowMonitor(m_handle, m_monitor, NULL, NULL, NULL, NULL, NULL); m_isFullscreen = true; }
+	void minimize() { glfwSetWindowMonitor(m_handle, NULL, NULL, NULL, NULL, NULL, NULL); m_isFullscreen = false; }
+	bool isFullscreen() const { return m_isFullscreen; }
 	void close() { glfwSetWindowShouldClose(m_handle, GLFW_TRUE); }
-	bool shouldClose() { return glfwWindowShouldClose(m_handle); }
+	bool shouldClose() const { return glfwWindowShouldClose(m_handle); }
 
-	bool m_cursorLocked;
+	// cursor
+	void lockCursor() { glfwSetInputMode(m_handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED); m_cursorLocked = true; }
+	void unlockCursor() { glfwSetInputMode(m_handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL); m_cursorLocked = false; }
+	bool isCursorLocked() const { return m_cursorLocked; }
+
+	void setWinX(int x) { win_size_x = x; }
+	void setWinY(int y) { win_size_y = y; }
+	
+private:
+
+	// taskbar icon
+	GLFWimage icons[1];
+
+	int win_size_x, win_size_y;
+	bool m_cursorLocked, m_isFullscreen;
+
+	GLFWmonitor* m_monitor = nullptr;
+	GLFWwindow* m_handle = nullptr;
 };

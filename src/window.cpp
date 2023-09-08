@@ -2,30 +2,35 @@
 
 #include <iostream>
 
-Window::Window(char* name, glm::ivec2 size)
-	: m_window_size{size}, m_keyboard{ Keyboard() }, m_mouse{ Mouse() }
+#include <glm/glm.hpp>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <util/stb_image.h>
+
+Window::Window(GLFWwindow* window_)
+	: win_size_x{ glfwGetVideoMode(glfwGetPrimaryMonitor())->width }, win_size_y{ glfwGetVideoMode(glfwGetPrimaryMonitor())->height },
+	m_handle{ window_ }, icons{ 0 }, m_monitor{ glfwGetPrimaryMonitor() }, m_isFullscreen{ false }, m_cursorLocked{ false }
 {
-	// create window
-	m_handle = glfwCreateWindow(size.x, size.y, name, NULL, NULL);
+	glfwSetWindowAspectRatio(m_handle, 16, 9);
 
-	// set a global Userpointer to window class to access callbacks via a wrapper
 	glfwSetWindowUserPointer(m_handle, this);
+	glfwSetWindowSizeCallback(m_handle, [](GLFWwindow* window, int width, int height)
+		{
+			Window* win = (Window*)glfwGetWindowUserPointer(window);
+			glViewport(0, 0, width, height);
+			win->setWinX(width);
+			win->setWinY(height);
+		});
+	glfwSetWindowUserPointer(m_handle, nullptr);
 
-	// add mouse and keyboard input
-	m_keyboard.init(this);
-	m_mouse.init(this);
-
-	// lock cursor to and maximize window
-	glfwSetInputMode(m_handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	m_cursorLocked = true;
-	glfwMaximizeWindow(m_handle);
+	// set a icon
+	icons[0].pixels = stbi_load("res/steve32x32.png", &icons[0].width, &icons[0].height, 0, 4); //rgba channels 
+	glfwSetWindowIcon(m_handle, 1, icons);
+	stbi_image_free(icons[0].pixels);
 }
 
 Window::~Window()
 {
-	if (this->m_handle == nullptr) {
-		return;
-	}
-
+	glfwDestroyWindow(m_handle);
 	glfwTerminate();
 }

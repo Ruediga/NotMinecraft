@@ -42,8 +42,22 @@ void Keyboard::key_callback(GLFWwindow* window, int key, int scancode, int actio
 
 void Mouse::cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
-	mousePos.x = xpos;
-	mousePos.y = ypos;
+	pos_x = xpos;
+	pos_y = ypos;
+
+	// if first mouse
+	if (first)
+	{
+		last_x = xpos;
+		last_y = ypos;
+		first = false;
+	}
+
+	x_offset = pos_x - last_x;
+	y_offset = last_y - pos_y;
+
+	last_x = xpos;
+	last_y = ypos;
 }
 
 void Mouse::mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
@@ -56,5 +70,5 @@ void Mouse::mouse_button_callback(GLFWwindow* window, int button, int action, in
 
 void Mouse::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-	scrollOffset += yoffset;
+	scrollOffset = yoffset;
 }

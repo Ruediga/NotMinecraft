@@ -3,7 +3,7 @@
 // prevent glad include errors
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "../lib/glm/glm.hpp"
+#include <glm/glm.hpp>
 
 class Window;
 
@@ -25,9 +25,14 @@ struct Keyboard
 
 struct Mouse
 {
+	bool first = true;
+
+	double pos_x = 0, pos_y = 0;
+	double last_x = 0, last_y = 0;
+	double x_offset = 0, y_offset = 0;
+	double scrollOffset = 0;
+
 	Button buttons[GLFW_MOUSE_BUTTON_LAST]{ false };
-	glm::dvec2 mousePos{ 0, 0 };
-	double scrollOffset{ 0 };
 
 	Mouse() = default;
 	void init(Window* window);
@@ -36,9 +41,4 @@ struct Mouse
 	void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 	void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 	void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-
-	void update()
-	{
-		
-	}
 };

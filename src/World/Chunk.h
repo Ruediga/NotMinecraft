@@ -1,28 +1,25 @@
 #pragma once
 
-#include <array>
+#include <glm/glm.hpp>
 
-#include <glm.hpp>
+#include <stdint.h>
 
-#include "Block.h"
-
-#define CHUNK_SIZE_X 16
-#define CHUNK_SIZE_Y 128
-#define CHUNK_SIZE_Z 16
+namespace ChunkData
+{
+	constexpr int CHUNK_SIZE_X = 16;
+	constexpr int CHUNK_SIZE_Y = 128;
+	constexpr int CHUNK_SIZE_Z = 16;
+	constexpr int CHUNK_VOLUME = CHUNK_SIZE_X * CHUNK_SIZE_Y * CHUNK_SIZE_Z;
+}
 
 class Chunk
 {
 public:
-	Chunk(glm::ivec2 chunk_position);
-	~Chunk();
+	uint8_t* genMesh();
 
-	// chunk manipulation
-	void setBlock(glm::vec3& pos, Block::BlockType block_type);
-	Block* getBlock(glm::vec3& pos);
-
-	void render();
+	void setBlock(glm::uvec3 pos, uint8_t block);
+	uint8_t getBlock(glm::uvec3 pos);
 
 private:
-	glm::ivec2 m_chunkPosition;
-	std::array<std::array<std::array<Block, CHUNK_SIZE_X>, CHUNK_SIZE_Y>, CHUNK_SIZE_Z> m_chunkData;
+	uint8_t m_chunk_array[ChunkData::CHUNK_VOLUME]{0};
 };

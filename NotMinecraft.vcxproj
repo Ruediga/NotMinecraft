@@ -19,27 +19,28 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="lib\glad.c" />
+    <ClCompile Include="lib\GLAD\src\glad.c" />
     <ClCompile Include="src\Game.cpp" />
-    <ClCompile Include="src\input.cpp" />
     <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\Renderer\RenderMaster.cpp" />
-    <ClCompile Include="src\Renderer\SimpleCubeRenderer.cpp" />
+    <ClCompile Include="src\Player.cpp" />
+    <ClCompile Include="src\Rendering\SimpleCubeRenderer.cpp" />
     <ClCompile Include="src\window.cpp" />
-    <ClCompile Include="src\World\Block.cpp" />
     <ClCompile Include="src\World\Chunk.cpp" />
     <ClCompile Include="src\World\World.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\FPSCamera.h" />
     <ClInclude Include="src\Abstract OpenGL\Shader.h" />
     <ClInclude Include="src\Game.h" />
-    <ClInclude Include="src\input.h" />
-    <ClInclude Include="src\Renderer\RenderMaster.h" />
-    <ClInclude Include="src\Renderer\SimpleCubeRenderer.h" />
+    <ClInclude Include="src\Player.h" />
+    <ClInclude Include="src\Rendering\SimpleCubeRenderer.h" />
     <ClInclude Include="src\window.h" />
-    <ClInclude Include="src\World\Block.h" />
     <ClInclude Include="src\World\Chunk.h" />
     <ClInclude Include="src\World\World.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Shaders\simpleCubeFragmentShader.glsl" />
+    <None Include="src\Shaders\simpleCubeVertexShader.glsl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -95,8 +96,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\felix\source\repos\0-Projects-0\NotMinecraft\lib\glm;C:\Users\felix\source\repos\0-Projects-0\NotMinecraft\lib\GLFW\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\felix\source\repos\0-Projects-0\NotMinecraft\lib\GLFW\Libs;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\felix\source\repos\0-Projects\NotMinecraft\lib\GLAD\include;C:\Users\felix\source\repos\0-Projects\NotMinecraft\lib\GLFW\include;C:\Users\felix\source\repos\0-Projects\NotMinecraft\lib\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\felix\source\repos\0-Projects\NotMinecraft\lib\GLFW\Libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>C:\Users\felix\source\GLFW\Include;$(IncludePath)</IncludePath>
