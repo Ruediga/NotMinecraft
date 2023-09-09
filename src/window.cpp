@@ -11,13 +11,15 @@ Window::Window(GLFWwindow* window_)
 	: win_size_x{ glfwGetVideoMode(glfwGetPrimaryMonitor())->width }, win_size_y{ glfwGetVideoMode(glfwGetPrimaryMonitor())->height },
 	m_handle{ window_ }, icons{ 0 }, m_monitor{ glfwGetPrimaryMonitor() }, m_isFullscreen{ false }, m_cursorLocked{ false }
 {
-	glfwSetWindowAspectRatio(m_handle, 16, 9);
-
 	glfwSetWindowUserPointer(m_handle, this);
-	glfwSetWindowSizeCallback(m_handle, [](GLFWwindow* window, int width, int height)
+	glfwSetFramebufferSizeCallback(m_handle, [](GLFWwindow* window, int width, int height)
 		{
 			Window* win = (Window*)glfwGetWindowUserPointer(window);
 			glViewport(0, 0, width, height);
+		});
+	glfwSetWindowSizeCallback(m_handle, [](GLFWwindow* window, int width, int height)
+		{
+			Window* win = (Window*)glfwGetWindowUserPointer(window);
 			win->setWinX(width);
 			win->setWinY(height);
 		});
@@ -33,4 +35,31 @@ Window::~Window()
 {
 	glfwDestroyWindow(m_handle);
 	glfwTerminate();
+}
+
+void Window::maximize()
+{
+	const GLFWvidmode* vm = glfwGetVideoMode(m_monitor);
+	glfwSetWindowMonitor(m_handle, m_monitor, 0, 0, vm->width, vm->height, vm->refreshRate);
+	m_isFullscreen = true;
+}
+
+void Window::minimize()
+{
+	const GLFWvidmode* vm = glfwGetVideoMode(m_monitor);
+	glfwSetWindowMonitor(m_handle, NULL, 0, 0, vm->width, vm->height, vm->refreshRate);
+	glfwMaximizeWindow(m_handle);
+	m_isFullscreen = false;
+}
+
+void Window::lockCursor()
+{
+	glfwSetInputMode(m_handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	m_cursorLocked = true;
+}
+
+void Window::unlockCursor()
+{
+	glfwSetInputMode(m_handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	m_cursorLocked = false;
 }

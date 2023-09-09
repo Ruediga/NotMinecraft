@@ -14,51 +14,52 @@ out vec3 vertexColor;
 // winding order 0, 1, 2, 1, 0, 3
 vec3 backFacePositions[4] = vec3[4](
 	vec3(-0.5f, -0.5f, -0.5f), // Bottom left
-	vec3(0.5f, -0.5f, -0.5f), // Top Right
-	vec3(0.5f, 0.5f, -0.5f), // Top Left
-	vec3(-0.5f, 0.5f, -0.5f)  // Bottom Right
+	vec3(0.5f,  0.5f, -0.5f), // Top Right
+	vec3(0.5f, -0.5f, -0.5f), // Top Left
+	vec3(-0.5f,  0.5f, -0.5f)  // Bottom Right
 );
 
 vec3 frontFacePositions[4] = vec3[4](
-	vec3(0.0f, 0.0f, 1.0f), // Bottom left
-	vec3(1.0f, 1.0f, 1.0f), // Top Right
-	vec3(0.0f, 1.0f, 1.0f), // Top Left
-	vec3(1.0f, 0.0f, 1.0f)  // Bottom Right
+	vec3(-0.5f, -0.5f,  0.5f), // Bottom left
+	vec3(0.5f,  0.5f,  0.5f), // Top Left
+	vec3(-0.5f, 0.5f,  0.5f),  // Bottom Right
+	vec3(0.5f, -0.5f,  0.5f) // Top Right
 );
 
 vec3 leftFacePositions[4] = vec3[4](
-	vec3(0.0f, 1.0f, 1.0f), // Top right
-	vec3(0.0f, 0.0f, 0.0f), // Bottom left
-	vec3(0.0f, 0.0f, 1.0f), // Top left
-	vec3(0.0f, 1.0f, 0.0f)  // Bottom right
+	vec3(-0.5f, -0.5f, -0.5f), // Top left
+	vec3(-0.5f,  0.5f,  0.5f), // Top right
+	vec3(-0.5f,  0.5f, -0.5f), // Bottom left
+	vec3(-0.5f, -0.5f,  0.5f)  // Bottom right
 );
 
 vec3 rightFacePositions[4] = vec3[4](
-	vec3(1.0f, 1.0f, 1.0f), // Top right
-	vec3(1.0f, 0.0f, 0.0f), // Bottom left
-	vec3(1.0f, 1.0f, 0.0f), // Bottom right
-	vec3(1.0f, 0.0f, 1.0f)  // Top left
+	vec3(0.5f,  0.5f,  0.5f), // Top right
+	vec3(0.5f, -0.5f, -0.5f), // Bottom left
+	vec3(0.5f,  0.5f, -0.5f), // Bottom right
+	vec3(0.5f, -0.5f,  0.5f)  // Top left
 );
 
 vec3 topFacePositions[4] = vec3[4](
-	vec3(0.0f, 1.0f, 0.0f),
-	vec3(1.0f, 1.0f, 1.0f),
-	vec3(1.0f, 1.0f, 0.0f),
-	vec3(0.0f, 1.0f, 1.0f)
+	vec3(-0.5f,  0.5f, -0.5f),
+	vec3(0.5f,  0.5f,  0.5f),
+	vec3(0.5f,  0.5f, -0.5f),
+	vec3(-0.5f,  0.5f,  0.5f)
 );
 
 vec3 bottomFacePositions[4] = vec3[4](
-	vec3(0.0f, 0.0f, 1.0f),
-	vec3(1.0f, 0.0f, 0.0f),
-	vec3(1.0f, 0.0f, 1.0f),
-	vec3(0.0f, 0.0f, 0.0f)
+	vec3(0.5f, -0.5f,  0.5f),
+	vec3(-0.5f, -0.5f, -0.5f),
+	vec3(0.5f, -0.5f, -0.5f),
+	vec3(-0.5f, -0.5f,  0.5f)
 );
 
 // the order that vertices must be rendered
 // because of the winding order required for backface culling
 int indices[6] = int[6]( 0, 1, 2, 1, 0, 3 );
 
-// of the six vertices per face send, depending on the face, figure out which vertex we are at and get the corresponding vertex local vector
+// of the six vertices per face send, depending on the face,
+// figure out which vertex we are at and get the corresponding vertex local vector
 void main()
 {
 	// position for the vertex in world space
@@ -92,5 +93,5 @@ void main()
 	// for debugging purposes
 	vertexColor = vec3(1.0f, 0.0f, 0.0f);
 
-	gl_Position = projection * view * vec4(aPos, 1.0f);
+	gl_Position = projection * view * vec4(vertexPosition, 1.0f);
 }

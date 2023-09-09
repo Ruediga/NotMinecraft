@@ -14,7 +14,9 @@ public:
 		FORWARD,
 		BACKWARD,
 		LEFT,
-		RIGHT
+		RIGHT,
+		UP,
+		DOWN,
 	};
 
 	Camera(glm::vec3 _position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 _up = glm::vec3(0.0f, 1.0f, 0.0f), float _yaw = -90.0f, float _pitch = 0.0f)
@@ -35,6 +37,7 @@ public:
 	void updateMovement(Camera::Movement direction, float dt)
 	{
 		float velocity = movementSpeed * dt;
+
 		switch (direction)
 		{
 		case (Movement::FORWARD): {
@@ -51,6 +54,14 @@ public:
 		}
 		case (Movement::RIGHT): {
 			position += right * velocity;
+			break;
+		}
+		case (Movement::UP): {
+			position += worldUp * velocity;
+			break;
+		}
+		case (Movement::DOWN): {
+			position -= worldUp * velocity;
 			break;
 		}
 		}
@@ -94,14 +105,12 @@ private:
 
 	void updateCameraVectors()
 	{
-		//
 		glm::vec3 new_front{};
 		new_front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
 		new_front.y = sin(glm::radians(pitch));
 		new_front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
 		front = glm::normalize(new_front);
-
-		right = glm::normalize(glm::cross(front, worldUp));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
+		right = glm::normalize(glm::cross(front, worldUp));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement
 		up = glm::normalize(glm::cross(right, front));
 	}
 };

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Player.h"
+#include "World/World.h"
 
 #include <chrono>
 
@@ -64,6 +65,8 @@ public:
 	Keyboard m_keyboard;
 
 private:
+	bool m_shouldGoFullscreen;
+
 	SimpleCubeRenderer* scr;
 
 	void handleInput(std::chrono::microseconds dt);
@@ -75,4 +78,6 @@ private:
 
 	// window specific input and display
 	Window m_window;
+
+	World m_world;
 };

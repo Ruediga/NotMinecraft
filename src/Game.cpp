@@ -12,7 +12,7 @@
 
 Game::Game(GLFWwindow* window_) :
 	m_state{ GameRunning }, m_window{ Window( window_ ) }, m_player{ Player() },
-	scr{ nullptr }, m_mouse{ Mouse() }, m_keyboard{ Keyboard() }
+	scr{ nullptr }, m_mouse{ Mouse() }, m_keyboard{ Keyboard() }, m_world{ World() }, m_shouldGoFullscreen{ 0 }
 {
 	// key callbacks
 	glfwSetWindowUserPointer(m_window.getWindowHandle(), this);
@@ -41,6 +41,13 @@ Game::Game(GLFWwindow* window_) :
 	glfwSetScrollCallback(m_window.getWindowHandle(), scroll_callback_wrapper);
 
 	scr = new SimpleCubeRenderer();
+
+
+
+	m_world.addChunk(0, 0);
+	m_world.fillExampleChunk(0, 0);
+	m_world.findChunk(0, 0)->printChunk();
+	std::cout << "done";
 }
 
 Game::~Game()
@@ -57,6 +64,14 @@ void Game::handleInput(std::chrono::microseconds dt)
 	// also runs key callback input handling
 	glfwPollEvents();
 
+	// CANNOT be done from callbacks or a seperate thread other than the main one!!!
+	if (m_shouldGoFullscreen) {
+		m_window.maximize();
+	}
+	else if (m_window.isFullscreen()) {
+		m_window.minimize();
+	}
+
 	if (m_keyboard.keys[GLFW_KEY_W].pressed)
 		m_player.cam.updateMovement(Camera::Movement::FORWARD, dts);
 	if (m_keyboard.keys[GLFW_KEY_S].pressed)
@@ -65,6 +80,10 @@ void Game::handleInput(std::chrono::microseconds dt)
 		m_player.cam.updateMovement(Camera::Movement::LEFT, dts);
 	if (m_keyboard.keys[GLFW_KEY_D].pressed)
 		m_player.cam.updateMovement(Camera::Movement::RIGHT, dts);
+	if (m_keyboard.keys[GLFW_KEY_SPACE].pressed)
+		m_player.cam.updateMovement(Camera::Movement::UP, dts);
+	if (m_keyboard.keys[GLFW_KEY_LEFT_CONTROL].pressed)
+		m_player.cam.updateMovement(Camera::Movement::DOWN, dts);
 
 	std::string fps = std::to_string(1.0f / dts);
 	m_window.setTitle(fps.c_str());
@@ -94,7 +113,14 @@ void Game::key_callback(GLFWwindow* window, int key, int scancode, int action, i
 	if (action == GLFW_RELEASE)
 		m_keyboard.keys[key].pressed = false;
 
-
+	if (key == GLFW_KEY_F11 && action == GLFW_PRESS) {
+		if (m_shouldGoFullscreen) {
+			m_shouldGoFullscreen = false;
+		}
+		else {
+			m_shouldGoFullscreen = true;
+		}
+	}
 
 	switch (m_state)
 	{
@@ -113,15 +139,6 @@ void Game::key_callback(GLFWwindow* window, int key, int scancode, int action, i
 			}
 			else {
 				m_window.lockCursor();
-			}
-			break;
-		}
-		if (key == GLFW_KEY_O && action == GLFW_PRESS) {
-			if (m_window.isFullscreen()) {
-				m_window.minimize();
-			}
-			else {
-				m_window.maximize();
 			}
 			break;
 		}
@@ -223,7 +240,7 @@ void Game::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 void Game::renderGame()
 {
 	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
 
 	glClearColor(0.5f, 0.6f, 0.9f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -238,7 +255,7 @@ void Game::renderGame()
 	glm::mat4 view = m_player.cam.getViewMatrix();
 	scr->shader->setMat4("view", view);
 
-	scr->shader->setFloat("blockSize", 5.0f);
+	scr->shader->setFloat("blockSize", 1.0f);
 
 	glBindVertexArray(scr->vao);
 

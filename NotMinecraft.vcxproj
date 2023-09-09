@@ -35,6 +35,7 @@
     <ClInclude Include="src\Player.h" />
     <ClInclude Include="src\Rendering\SimpleCubeRenderer.h" />
     <ClInclude Include="src\window.h" />
+    <ClInclude Include="src\World\Block.h" />
     <ClInclude Include="src\World\Chunk.h" />
     <ClInclude Include="src\World\World.h" />
   </ItemGroup>

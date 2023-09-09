@@ -19,15 +19,16 @@ public:
 	
 	// window
 	void setTitle(const char* text) { glfwSetWindowTitle(m_handle, text); }
-	void maximize() { glfwSetWindowMonitor(m_handle, m_monitor, NULL, NULL, NULL, NULL, NULL); m_isFullscreen = true; }
-	void minimize() { glfwSetWindowMonitor(m_handle, NULL, NULL, NULL, NULL, NULL, NULL); m_isFullscreen = false; }
+	void maximize();
+	void minimize();
 	bool isFullscreen() const { return m_isFullscreen; }
 	void close() { glfwSetWindowShouldClose(m_handle, GLFW_TRUE); }
 	bool shouldClose() const { return glfwWindowShouldClose(m_handle); }
 
 	// cursor
-	void lockCursor() { glfwSetInputMode(m_handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED); m_cursorLocked = true; }
-	void unlockCursor() { glfwSetInputMode(m_handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL); m_cursorLocked = false; }
+	void centerCursor() { glfwSetCursorPos(m_handle, double(win_size_x) / 2, double(win_size_y) / 2); }
+	void lockCursor();
+	void unlockCursor();
 	bool isCursorLocked() const { return m_cursorLocked; }
 
 	void setWinX(int x) { win_size_x = x; }
