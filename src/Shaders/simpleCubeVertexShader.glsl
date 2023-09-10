@@ -54,10 +54,6 @@ vec3 bottomFacePositions[4] = vec3[4](
 	vec3(-0.5f, -0.5f,  0.5f)
 );
 
-// the order that vertices must be rendered
-// because of the winding order required for backface culling
-int indices[6] = int[6]( 0, 1, 2, 1, 0, 3 );
-
 // of the six vertices per face send, depending on the face,
 // figure out which vertex we are at and get the corresponding vertex local vector
 void main()
