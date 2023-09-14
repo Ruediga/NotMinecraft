@@ -4,7 +4,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
-
+// thanks to some guy on github for this implementation please don't sue me
 class TextureArray
 {
 public:

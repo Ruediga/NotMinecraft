@@ -305,12 +305,19 @@ void Game::renderGame()
 	glm::mat4 view = m_player.cam.getViewMatrix();
 	m_world.shader->setMat4("view", view);
 
+	// draw only the edges
+	if (m_enableLineDraw) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glDisable(GL_CULL_FACE);
+	}
+	else {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glEnable(GL_CULL_FACE);
+	}
+
 	for (Chunk* chunk : m_world.chunk_vec) {
 		glBindVertexArray(chunk->VAO);
-		if (m_enableLineDraw)
-			glDrawArrays(GL_LINES, 0, chunk->meshData.size());
-		else
-			glDrawArrays(GL_TRIANGLES, 0, chunk->meshData.size());
+		glDrawArrays(GL_TRIANGLES, 0, chunk->meshData.size());
 	}
 
 	// don't rmv
