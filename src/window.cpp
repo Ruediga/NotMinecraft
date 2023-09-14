@@ -15,11 +15,6 @@ Window::Window(GLFWwindow* window_)
 	glfwSetFramebufferSizeCallback(m_handle, [](GLFWwindow* window, int width, int height)
 		{
 			Window* win = (Window*)glfwGetWindowUserPointer(window);
-			glViewport(0, 0, width, height);
-		});
-	glfwSetWindowSizeCallback(m_handle, [](GLFWwindow* window, int width, int height)
-		{
-			Window* win = (Window*)glfwGetWindowUserPointer(window);
 			win->setWinX(width);
 			win->setWinY(height);
 		});

@@ -6,13 +6,13 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glad/glad.h>
-
+#include <algorithm>
 
 #include "Rendering/SimpleCubeRenderer.h"
 
 Game::Game(GLFWwindow* window_) :
 	m_state{ GameRunning }, m_window{ Window( window_ ) }, m_player{ Player() },
-	scr{ nullptr }, m_mouse{ Mouse() }, m_keyboard{ Keyboard() }, m_world{ World() }, m_shouldGoFullscreen{ 0 }
+	scr{ nullptr }, m_mouse{ Mouse() }, m_keyboard{ Keyboard() }, m_world{ World() }, m_shouldGoFullscreen{ 0 }, m_enableLineDraw{ 0 }
 {
 	// key callbacks
 	glfwSetWindowUserPointer(m_window.getWindowHandle(), this);
@@ -42,12 +42,10 @@ Game::Game(GLFWwindow* window_) :
 
 	scr = new SimpleCubeRenderer();
 
-
-
-	m_world.addChunk(0, 0);
-	m_world.fillExampleChunk(0, 0);
-	m_world.findChunk(0, 0)->printChunk();
-	std::cout << "done";
+	texArray = new TextureArray();
+	texArray->AddTextureToArray("res/grass_side.png");
+	texArray->AddTextureToArray("res/grass_top.png");
+	texArray->AddTextureToArray("res/grass_bottom.png");
 }
 
 Game::~Game()
@@ -55,14 +53,34 @@ Game::~Game()
 	m_window.close();
 }
 
-using micros = std::chrono::microseconds;
-void Game::handleInput(std::chrono::microseconds dt)
+void Game::handleInput(std::chrono::milliseconds dt)
 {
 	// delta time in seconds
-	float dts = static_cast<float>(dt.count()) / 1000000.0f;
+	float dts = static_cast<float>(dt.count()) / 1000.0f;
 	
 	// also runs key callback input handling
 	glfwPollEvents();
+
+
+
+
+	// raycasting test
+	glm::vec3 hit_pos = { 0, 0, 0 };
+
+	// cast a ray and check for intersections with world
+	if (m_pendingRayCast) {
+		glm::vec3 relative_cam_pos = { m_player.cam.position.x * 4, m_player.cam.position.y * 4, m_player.cam.position.z * 4 };
+		hit_pos = m_world.castRay(relative_cam_pos, m_player.cam.getNormalizedDirectionVector());
+		m_pendingRayCast = false;
+		m_world.breakBlock(hit_pos.x, hit_pos.y, hit_pos.z);
+		std::cout << "x: " << hit_pos.x << ", y: " << hit_pos.y << ", z: " << hit_pos.z << "\n";
+	}
+
+
+
+
+
+
 
 	// CANNOT be done from callbacks or a seperate thread other than the main one!!!
 	if (m_shouldGoFullscreen) {
@@ -72,6 +90,8 @@ void Game::handleInput(std::chrono::microseconds dt)
 		m_window.minimize();
 	}
 
+	if (m_keyboard.keys[GLFW_KEY_LEFT_SHIFT].pressed)
+		m_player.cam.triple_speed_enabled = true;
 	if (m_keyboard.keys[GLFW_KEY_W].pressed)
 		m_player.cam.updateMovement(Camera::Movement::FORWARD, dts);
 	if (m_keyboard.keys[GLFW_KEY_S].pressed)
@@ -84,25 +104,38 @@ void Game::handleInput(std::chrono::microseconds dt)
 		m_player.cam.updateMovement(Camera::Movement::UP, dts);
 	if (m_keyboard.keys[GLFW_KEY_LEFT_CONTROL].pressed)
 		m_player.cam.updateMovement(Camera::Movement::DOWN, dts);
+	// reset triple speed
+	m_player.cam.triple_speed_enabled = false;
 
-	std::string fps = std::to_string(1.0f / dts);
+	std::string fps = std::to_string(1.0f / dts) += " fps";
 	m_window.setTitle(fps.c_str());
 }
 
 void Game::loop()
 {
-	micros deltaTime{ 0 };
+	std::chrono::milliseconds deltaTime{ 0 };
+
+	const int fps{ 100 };
+	const std::chrono::milliseconds timePerFrame{ 1000 / fps };
 
 	while (!m_window.shouldClose())
 	{
-		auto start_time = std::chrono::high_resolution_clock::now();
+		auto start_time = std::chrono::steady_clock::now();
 	
 		handleInput(deltaTime);
-		
+
 		renderGame();
 		
-		auto end_time = std::chrono::high_resolution_clock::now();
-		deltaTime = std::chrono::duration_cast<micros>(end_time - start_time);
+		auto frame_time = std::chrono::steady_clock::now();
+		//std::chrono::duration<double> time = frame_time - start_time;
+		//std::cout << time * 1000 << "\n";
+		auto waitDur{ std::chrono::duration_cast<std::chrono::milliseconds>(timePerFrame - (frame_time - start_time)) };
+		if (waitDur.count() > 0) {
+			std::this_thread::sleep_for(waitDur);
+		}
+
+		auto end_time = std::chrono::steady_clock::now();
+		deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
 	}
 }
 
@@ -139,6 +172,15 @@ void Game::key_callback(GLFWwindow* window, int key, int scancode, int action, i
 			}
 			else {
 				m_window.lockCursor();
+			}
+			break;
+		}
+		if (key == GLFW_KEY_L && action == GLFW_PRESS) {
+			if (m_enableLineDraw) {
+				m_enableLineDraw = false;
+			}
+			else {
+				m_enableLineDraw = true;
 			}
 			break;
 		}
@@ -207,6 +249,9 @@ void Game::mouse_button_callback(GLFWwindow* window, int button, int action, int
 	}
 
 	case(GameRunning): {
+		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+			m_pendingRayCast = true;
+		}
 		break;
 	}
 
@@ -245,21 +290,28 @@ void Game::renderGame()
 	glClearColor(0.5f, 0.6f, 0.9f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-	scr->shader->use();
+	m_world.shader->use();
+	m_world.shader->setFloat("blockSize", 0.25f);
+
+	texArray->Bind();
+	texArray->ActivateShaderArray(m_world.shader->ID);
 
 	// projection matrix
-	glm::mat4 projection = glm::perspective(glm::radians(m_player.cam.getZoom()), (float)m_window.getSize().x / (float)m_window.getSize().y, 0.1f, 1000.0f);
-	scr->shader->setMat4("projection", projection);
+	glm::mat4 projection = glm::perspective(glm::radians(m_player.cam.getZoom()), (float)m_window.getSize().x / (float)m_window.getSize().y, 0.0025f, 1000.0f);
+	glViewport(0, 0, m_window.getSize().x, m_window.getSize().y);
+	m_world.shader->setMat4("projection", projection);
 
 	// camera matrix
 	glm::mat4 view = m_player.cam.getViewMatrix();
-	scr->shader->setMat4("view", view);
+	m_world.shader->setMat4("view", view);
 
-	scr->shader->setFloat("blockSize", 1.0f);
-
-	glBindVertexArray(scr->vao);
-
-	glDrawArrays(GL_TRIANGLES, 0, 36);
+	for (Chunk* chunk : m_world.chunk_vec) {
+		glBindVertexArray(chunk->VAO);
+		if (m_enableLineDraw)
+			glDrawArrays(GL_LINES, 0, chunk->meshData.size());
+		else
+			glDrawArrays(GL_TRIANGLES, 0, chunk->meshData.size());
+	}
 
 	// don't rmv
 	glfwSwapBuffers(m_window.getWindowHandle());

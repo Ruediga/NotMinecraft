@@ -24,6 +24,7 @@
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Player.cpp" />
     <ClCompile Include="src\Rendering\SimpleCubeRenderer.cpp" />
+    <ClCompile Include="src\TextureArray.cpp" />
     <ClCompile Include="src\window.cpp" />
     <ClCompile Include="src\World\Chunk.cpp" />
     <ClCompile Include="src\World\World.cpp" />
@@ -34,6 +35,7 @@
     <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\Player.h" />
     <ClInclude Include="src\Rendering\SimpleCubeRenderer.h" />
+    <ClInclude Include="src\TextureArray.h" />
     <ClInclude Include="src\window.h" />
     <ClInclude Include="src\World\Block.h" />
     <ClInclude Include="src\World\Chunk.h" />
@@ -101,7 +103,7 @@
     <LibraryPath>C:\Users\felix\source\repos\0-Projects\NotMinecraft\lib\GLFW\Libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\Users\felix\source\GLFW\Include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\felix\source\repos\0-Projects\NotMinecraft\lib\GLAD\include;C:\Users\felix\source\repos\0-Projects\NotMinecraft\lib\GLFW\include;C:\Users\felix\source\repos\0-Projects\NotMinecraft\lib\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\felix\source\GLFW\Libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

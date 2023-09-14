@@ -7,6 +7,7 @@
 
 #include "window.h"
 #include "Abstract OpenGL/Shader.h"
+#include "TextureArray.h"
 
 #include "Rendering/SimpleCubeRenderer.h"
 
@@ -65,11 +66,15 @@ public:
 	Keyboard m_keyboard;
 
 private:
+	bool m_pendingRayCast;
+	bool m_enableLineDraw;
 	bool m_shouldGoFullscreen;
 
 	SimpleCubeRenderer* scr;
+	
+	TextureArray* texArray;
 
-	void handleInput(std::chrono::microseconds dt);
+	void handleInput(std::chrono::milliseconds dt);
 
 	Player m_player;
 

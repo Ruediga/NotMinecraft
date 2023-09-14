@@ -36,6 +36,10 @@ public:
 
 	void updateMovement(Camera::Movement direction, float dt)
 	{
+		if (triple_speed_enabled)
+			movementSpeed = 7.5f;
+		else movementSpeed = 2.5f;
+
 		float velocity = movementSpeed * dt;
 
 		switch (direction)
@@ -86,11 +90,18 @@ public:
 		updateCameraVectors();
 	}
 
+	const glm::vec3& getNormalizedDirectionVector()
+	{
+		return front;
+	}
+
 	float getZoom() { return zoom; }
+
+	bool triple_speed_enabled;
+	glm::vec3 position;
 
 private:
 	// camera attributes
-	glm::vec3 position;
 	glm::vec3 front;
 	glm::vec3 up;
 	glm::vec3 right;
